@@ -50,6 +50,17 @@
 			</section>
 
         </main>
+		<!-- 調整：網頁最下方的雙版本顯示區 -->
+		<footer class="max-w-8xl mx-auto px-6 py-3 mt-4 flex justify-end items-center gap-6 text-xs text-gray-500 font-medium">
+			<div class="flex items-center gap-1">
+				<span class="text-gray-400">程式版本:</span>
+				<span id="app-version"><!-- 渲染 AppVersion --></span>
+			</div>
+			<div class="flex items-center gap-1">
+				<span class="text-gray-400">資料版本:</span>
+				<span id="data-version"><!-- 渲染 DataVersion --></span>
+			</div>
+		</footer>
     </div>
 
     <script>
@@ -86,9 +97,46 @@
 				}
 
 				// ----------------------------------------------------
-				// 核心邏輯 B：過濾並排序清單列表 (功能=1)
+				// 核心邏輯 C-1：動態替換 程式版本 (功能=1, 主旨=AppVersion, 排序=2)
 				// ----------------------------------------------------
-				projectData = rawData.filter(item => String(item['功能']).trim() === '1');
+				const appVersionRow = rawData.find(item => 
+					String(item['功能']).trim() === '1' && 
+					String(item['主旨']).trim() === 'AppVersion' &&
+					String(item['排序']).trim() === '2'
+				);
+
+				if (appVersionRow && appVersionRow['內崁html儲存']) {
+					let cleanAppHtml = appVersionRow['內崁html儲存'].replace(/""/g, '"');
+					document.getElementById('app-version').innerHTML = cleanAppHtml;
+				} else {
+					document.getElementById('app-version').innerText = '未設定';
+				}
+
+				// ----------------------------------------------------
+				// 核心邏輯 C-2：動態替換 資料版本 (功能=1, 主旨=DataVersion, 排序=1)
+				// ----------------------------------------------------
+				const dataVersionRow = rawData.find(item => 
+					String(item['功能']).trim() === '1' && 
+					String(item['主旨']).trim() === 'DataVersion' &&
+					String(item['排序']).trim() === '1'
+				);
+
+				if (dataVersionRow && dataVersionRow['內崁html儲存']) {
+					let cleanDataHtml = dataVersionRow['內崁html儲存'].replace(/""/g, '"');
+					document.getElementById('data-version').innerHTML = cleanDataHtml;
+				} else {
+					document.getElementById('data-version').innerText = '未設定';
+				}
+
+				// ----------------------------------------------------
+				// 核心邏輯 B：過濾並排序清單列表 (功能=1，排除所有版本控制項目)
+				// ----------------------------------------------------
+				// 這裡同時排除了 DataVersion 與 AppVersion，保持列表乾淨
+				projectData = rawData.filter(item => 
+					String(item['功能']).trim() === '1' && 
+					String(item['主旨']).trim() !== 'DataVersion' &&
+					String(item['主旨']).trim() !== 'AppVersion'
+				);
 				
 				// 依據「排序」欄位由小到大排列
 				projectData.sort((a, b) => Number(a['排序'] || 0) - Number(b['排序'] || 0));
