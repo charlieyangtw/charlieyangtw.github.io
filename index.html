@@ -41,12 +41,13 @@
                 </div>
             </section>
 
-            <section class="flex-1 p-6 overflow-y-auto">
-                <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">內崁 HTML 預覽</h3>
-                <div id="detail-html" class="bg-white p-4 rounded-lg border border-gray-200 min-h-[200px] shadow-2xs">
-                    <p class="text-xs text-gray-400 italic">暫無內嵌內容</p>
-                </div>
-            </section>
+            <!-- 右側下方：內崁 HTML 顯示區域 -->
+			<section class="flex-1 p-6 overflow-y-auto">
+				<!-- 🗑️ 這裡原本的 <h3>內崁 HTML 預覽</h3> 已經被整行刪除了 -->
+				<div id="detail-html" class="w-full h-full min-h-[300px]">
+					<!-- HTML 會被完美渲染在這裡 -->
+				</div>
+			</section>
 
         </main>
     </div>
@@ -119,23 +120,27 @@
 		}
 		
         // 點擊左側，切換右側顯示內容
-        function showDetail(index) {
-            const item = projectData[index];
-            if (!item) return;
+		function showDetail(index) {
+			const item = projectData[index];
+			if (!item) return;
 
-            document.getElementById('detail-title').innerText = item['主旨'];
-            document.getElementById('detail-date').innerText = item['建立日期時間'] ? `📅 ${item['建立日期時間']}` : '';
-            document.getElementById('detail-desc').innerHTML = item['描述'] || '無描述';
-            
-            // 渲染內崁 HTML (使用 innerHTML)
-            const htmlContainer = document.getElementById('detail-html');
-            if (item['內崁html儲存']) {
-                htmlContainer.innerHTML = item['內崁html儲存'];
-            } else {
-                htmlContainer.innerHTML = `<p class="text-xs text-gray-400 italic">此項目無內嵌 HTML 內容</p>`;
-            }
-        }
+			// 1. 更新右上方的標題、日期與描述
+			document.getElementById('detail-title').innerText = item['主旨'];
+			document.getElementById('detail-date').innerText = item['建立日期時間'] ? `📅 ${item['建立日期時間']}` : '';
+			document.getElementById('detail-desc').innerText = item['描述'] || '無描述';
+			
+			// 2. 處理並渲染右下方的內崁 HTML
+			const htmlContainer = document.getElementById('detail-html');
+			let rawHtml = item['內崁html儲存'] || '';
 
+			if (rawHtml) {
+				// 【關鍵修復】還原 CSV 轉義造成的雙引號問題，讓真實 HTML 格式生效
+				let cleanHtml = rawHtml.replace(/""/g, '"'); 
+				htmlContainer.innerHTML = cleanHtml;
+			} else {
+				htmlContainer.innerHTML = `<p class="text-xs text-gray-400 italic">此項目無內嵌 HTML 內容</p>`;
+			}
+		}
         // 初始化啟動
         loadSpreadsheetData();
     </script>
