@@ -23,12 +23,14 @@
 
     <div class="max-w-8xl mx-auto flex main-container">
         
-        <aside class="w-1/3 border-r border-gray-200 bg-white overflow-y-auto p-4">
-            <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">專案主旨清單</h2>
-            <div id="subject-list" class="space-y-2">
-                <p class="text-sm text-gray-500 animate-pulse">資料載入中...</p>
-            </div>
-        </aside>
+		<!-- 左側：列表 -->
+		<aside class="w-1/3 border-r border-gray-200 bg-white overflow-y-auto p-4">
+			<!-- 原本的「專案主旨清單」修改為「列表」 -->
+			<h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">列表</h2>
+			<div id="subject-list" class="space-y-2">
+				<p class="text-sm text-gray-500 animate-pulse">資料載入中...</p>
+			</div>
+		</aside>
 
         <main class="w-2/3 flex flex-col h-full bg-gray-50/50">
             
@@ -56,23 +58,35 @@
         // ======= 🛠️ 請在此處貼上你在步驟 1 複製的 Google 試算表 CSV 網址 =======
         const SPREADSHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRDLk_cATMmyuBpYBj9ky-snNltxCM4jb45B_6WjhhqUPCgPgE16cfhCATIFoSeEP-4DWwDURCQ2Ql3/pub?output=csv";
 
-        let projectData = [];
+        let projectData = []; // 這裡未來只儲存 功能為 1 的清單資料
 
-        // 從 Google Sheets 抓取資料
-        async function loadSpreadsheetData() {
+		async function loadSpreadsheetData() {
 			try {
 				const response = await fetch(SPREADSHEET_CSV_URL);
 				const csvText = await response.text();
 				
-				// 使用 PapaParse 進行官方標準解析，會自動處理好所有引號與換行
-				const results = Papa.parse(csvText, {
-					header: true,        // 自動將第一行當作物件的 Key (主旨、描述...)
-					skipEmptyLines: true // 自動跳過空行
-				});
+				// 解析 CSV 得到所有原始資料（如果你是用 PapaParse，請換成 results.data）
+				let rawData = parseCSV(csvText); 
+
+				// ----------------------------------------------------
+				// 核心邏輯 A：動態替換網站首頁標題 (功能=0, 主旨=Title)
+				// ----------------------------------------------------
+				const configRow = rawData.find(item => 
+					String(item['功能']).trim() === '0' && 
+					String(item['主旨']).trim() === 'Title'
+				);
 				
-				projectData = results.data;
+				if (configRow && configRow['內崁html儲存']) {
+					// 將右側原本的文字替換成試算表裡設定的 HTML 內容
+					document.getElementById('site-title').innerHTML = configRow['內崁html儲存'];
+				}
+
+				// ----------------------------------------------------
+				// 核心邏輯 B：過濾並排序清單列表 (功能=1)
+				// ----------------------------------------------------
+				projectData = rawData.filter(item => String(item['功能']).trim() === '1');
 				
-				// 依照「排序」欄位由小到大排序
+				// 依據「排序」欄位由小到大排列
 				projectData.sort((a, b) => Number(a['排序'] || 0) - Number(b['排序'] || 0));
 				
 				renderSubjectList();
@@ -82,24 +96,24 @@
 			}
 		}
 
-        // 渲染左側主旨清單
-        function renderSubjectList() {
-            const container = document.getElementById('subject-list');
-            if (projectData.length === 0) {
-                container.innerHTML = `<p class="text-sm text-gray-400">目前沒有專案資料。</p>`;
-                return;
-            }
+		// 渲染左側列表（只會顯示功能為 1 的項目）
+		function renderSubjectList() {
+			const container = document.getElementById('subject-list');
+			if (projectData.length === 0) {
+				container.innerHTML = `<p class="text-sm text-gray-400">目前列表沒有資料。</p>`;
+				return;
+			}
 
-            container.innerHTML = projectData.map((item, index) => `
-                <button onclick="showDetail(${index})" class="w-full text-left p-3 rounded-lg border border-gray-100 hover:bg-blue-50/50 hover:border-blue-200 transition cursor-pointer block group">
-                    <div class="font-medium text-sm text-gray-800 group-hover:text-blue-600 transition truncate">${item['主旨']}</div>
-                    <div class="text-[11px] text-gray-400 mt-1">排序: ${item['排序'] || 0}</div>
-                </button>
-            `).join('');
-            
-            // 預設顯示第一筆資料
-            showDetail(0);
-        }
+			container.innerHTML = projectData.map((item, index) => `
+				<button onclick="showDetail(${index})" class="w-full text-left p-3 rounded-lg border border-gray-100 hover:bg-blue-50/50 hover:border-blue-200 transition cursor-pointer block group">
+					<div class="font-medium text-sm text-gray-800 group-hover:text-blue-600 transition truncate">${item['主旨']}</div>
+					<div class="text-[11px] text-gray-400 mt-1">排序: ${item['排序'] || 0}</div>
+				</button>
+			`).join('');
+			
+			// 預設自動選取並開啟第一筆清單內容
+			showDetail(0);
+		}
 
         // 點擊左側，切換右側顯示內容
         function showDetail(index) {
