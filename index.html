@@ -60,14 +60,20 @@
 
         let projectData = []; // 這裡未來只儲存 功能為 1 的清單資料
 
-		async function loadSpreadsheetData() {
+        // 從 Google Sheets 抓取資料
+        async function loadSpreadsheetData() {
 			try {
 				const response = await fetch(SPREADSHEET_CSV_URL);
 				const csvText = await response.text();
 				
-				// 解析 CSV 得到所有原始資料（如果你是用 PapaParse，請換成 results.data）
-				let rawData = parseCSV(csvText); 
-
+				// 使用 PapaParse 進行官方標準解析，會自動處理好所有引號與換行
+				const results = Papa.parse(csvText, {
+					header: true,        // 自動將第一行當作物件的 Key (主旨、描述...)
+					skipEmptyLines: true // 自動跳過空行
+				});
+				
+				let rawData = results.data;
+				
 				// ----------------------------------------------------
 				// 核心邏輯 A：動態替換網站首頁標題 (功能=0, 主旨=Title)
 				// ----------------------------------------------------
@@ -114,7 +120,7 @@
 			// 預設自動選取並開啟第一筆清單內容
 			showDetail(0);
 		}
-
+		
         // 點擊左側，切換右側顯示內容
         function showDetail(index) {
             const item = projectData[index];
