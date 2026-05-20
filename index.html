@@ -143,13 +143,20 @@
 			let rawHtml = item['內崁html儲存'] || '';
 
 			if (rawHtml) {
-				// 【關鍵修復】還原 CSV 轉義造成的雙引號問題，讓真實 HTML 格式生效
 				let cleanHtml = rawHtml.replace(/""/g, '"'); 
+
+				// 【智慧判斷】如果內容不包含 HTML 結束標籤（如 </p> 或 </div>），代表是普通文字排版
+				if (!cleanHtml.includes('</')) {
+					// 自動將換行符號轉為網頁看得懂的 <br>
+					cleanHtml = cleanHtml.replace(/\r?\n/g, '<br>');
+				}
+
 				htmlContainer.innerHTML = cleanHtml;
 			} else {
 				htmlContainer.innerHTML = `<p class="text-xs text-gray-400 italic">此項目無內嵌 HTML 內容</p>`;
 			}
 		}
+		
         // 初始化啟動
         loadSpreadsheetData();
     </script>
