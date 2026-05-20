@@ -125,7 +125,7 @@
 
             document.getElementById('detail-title').innerText = item['主旨'];
             document.getElementById('detail-date').innerText = item['建立日期時間'] ? `📅 ${item['建立日期時間']}` : '';
-            document.getElementById('detail-desc').innerText = item['描述'] || '無描述';
+            document.getElementById('detail-desc').innerHTML = item['描述'] || '無描述';
             
             // 渲染內崁 HTML (使用 innerHTML)
             const htmlContainer = document.getElementById('detail-html');
