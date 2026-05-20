@@ -1,42 +1,194 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-TW">
 <head>
-	<title>Charlie Yang by Github</title>
-	<link rel="stylesheet" type="text/css" href="css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>團隊專案管理看板</title>
+    <!-- 引入 Tailwind CSS 用於快速排版 -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- 引入 SortableJS 實作拖曳功能 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 </head>
-<body>
-	<header>
-		<h1>查理楊-Github</h1>
-	</header>
-	<main>
-		<section id="home">
-			<article>
-				<img src="img/github.pages.png" alt="github.pages">
-				<h2>如何在GitHub裡, 用免費的網頁</h2>
-				<p>發佈日期: 2023-04-26</p>
-				<p>描述：原來Github有免費的web site, 雖然只能靜態的, 但也包含免費的域名, 這你還不要嗎?</p>
-                <a href="https://medium.com/%E9%80%B2%E6%93%8A%E7%9A%84-git-git-git/%E5%BE%9E%E9%9B%B6%E9%96%8B%E5%A7%8B-%E7%94%A8github-pages-%E4%B8%8A%E5%82%B3%E9%9D%9C%E6%85%8B%E7%B6%B2%E7%AB%99-fa2ae83e6276">參考</a>
-			</article>
-			<article>
-				<img src="img/vscode+chatgpt.png" alt="vscode+chatgpt">
-				<h2>如何在vscode裡, 加入chatGPT</h2>
-				<p>發佈日期: 2023-04-26</p>
-				<p>描述：在vscode裡, 想用chatGPT, 不必在切來切去了, 只要在vscode加入套件就搞定了, 快來學起來</p>
-                <a href="https://www.youtube.com/watch?v=eM_I6j_mKTo&ab_channel=CwC%E7%B6%B2%E9%A0%81%E8%A8%AD%E8%A8%88">參考</a>
-			</article>
-		</section>
-		<section id="about">
-            <a href="https://charlieyangtw.github.io/">
-                <img src="img/charlieyang.about.png" alt="charlieyang.about">
-            </a>
-			<h2>關於查理楊</h2>
-			<p>嗨，我是一位熱愛寫程式的開發者，專注於使用C#和Python等語言開發高品質的應用程序。我擁有豐富的T-SQL經驗，能夠輕鬆地處理各種數據庫相關的工作。<br><br>
-                在過去的20多年中，我積累了豐富的經驗，參與了各種各樣的項目，例如進銷存系統、支票系統、ComPort連接和網頁爬蟲等。我非常注重學習和提高技術水平，保持對新技術的關注和研究。<br><br>
-                除了技術方面，我也注重團隊合作和溝通。我相信，良好的合作和溝通是一個項目成功的關鍵。因此，我經常參與團隊討論和合作，並積極貢獻自己的能力和經驗，從而推動項目的成功。
-            </p>
-            <a href="https://github.com/charlieyangtw/"><img src="img/github.logo.png" alt="github.logo">Github</img></a>
-            <a href="https://www.linkedin.com/in/%E6%99%AF%E6%B7%B3-%E6%A5%8A-902916ab/"><img src="img/linkedin.logo.png" alt="linkedin.logo">Linkedin</img></a>
-		</section>
-	</main>
+<body class="bg-gray-50 font-sans min-h-screen pb-12">
+
+    <!-- 頂部導航欄 -->
+    <nav class="bg-white border-b border-gray-200 py-4 px-6 mb-8 shadow-xs">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                🚀 專案管理動態中心
+            </h1>
+            <span class="bg-blue-50 text-blue-600 text-xs font-semibold px-2.5 py-1 rounded border border-blue-200">
+                GitHub Pages 免費託管中
+            </span>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- 專案整體進度條 -->
+        <div class="bg-white p-6 rounded-xl border border-gray-200 mb-8 shadow-sm">
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="text-sm font-semibold text-gray-600 uppercase tracking-wider">專案總體進度</h2>
+                <span id="progress-text" class="text-sm font-bold text-blue-600">0%</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden border border-gray-200/50">
+                <div id="progress-bar" class="bg-blue-500 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- 新增任務表單 -->
+        <div class="bg-white p-6 rounded-xl border border-gray-200 mb-8 shadow-sm">
+            <h3 class="text-md font-bold text-gray-700 mb-4">➕ 新增專案任務</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <input id="task-title" type="text" placeholder="任務名稱（如：設計登入介面）" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500">
+                <select id="task-priority" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500">
+                    <option value="💡 低優先度">💡 低優先度</option>
+                    <option value="⚡ 普通">⚡ 普通</option>
+                    <option value="🔥 緊急">🔥 緊急</option>
+                </select>
+                <button onclick="addNewTask()" class="w-full bg-gray-900 text-white font-medium py-2 px-4 rounded-lg text-sm hover:bg-gray-800 transition shadow-xs cursor-pointer">
+                    加入看板
+                </button>
+            </div>
+        </div>
+
+        <!-- 看板主體 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- 待處理 -->
+            <div class="bg-gray-100/80 p-4 rounded-xl border border-gray-200 flex flex-col min-h-[400px]">
+                <div class="flex justify-between items-center mb-4 border-b border-gray-200 pb-2">
+                    <h3 class="font-bold text-gray-700 flex items-center gap-2">📝 待處理</h3>
+                    <span id="count-todo" class="bg-gray-200 text-gray-700 text-xs px-2 py-0.5 rounded-full font-medium">0</span>
+                </div>
+                <div id="todo" class="space-y-3 flex-1 overflow-y-auto min-h-[300px]">
+                    <!-- 任務會被動態插入到這裡 -->
+                </div>
+            </div>
+
+            <!-- 進行中 -->
+            <div class="bg-yellow-50/50 p-4 rounded-xl border border-yellow-100 flex flex-col min-h-[400px]">
+                <div class="flex justify-between items-center mb-4 border-b border-yellow-100 pb-2">
+                    <h3 class="font-bold text-yellow-800 flex items-center gap-2">⏳ 進行中</h3>
+                    <span id="count-doing" class="bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full font-medium">0</span>
+                </div>
+                <div id="doing" class="space-y-3 flex-1 overflow-y-auto min-h-[300px]"></div>
+            </div>
+
+            <!-- 已完成 -->
+            <div class="bg-green-50/50 p-4 rounded-xl border border-green-100 flex flex-col min-h-[400px]">
+                <div class="flex justify-between items-center mb-4 border-b border-green-100 pb-2">
+                    <h3 class="font-bold text-green-800 flex items-center gap-2">✅ 已完成</h3>
+                    <span id="count-done" class="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full font-medium">0</span>
+                </div>
+                <div id="done" class="space-y-3 flex-1 overflow-y-auto min-h-[300px]"></div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- 看板互動與資料儲存的核心 JavaScript -->
+    <script>
+        // 初始化預設資料（如果本地端沒有儲存紀錄）
+        let defaultTasks = [
+            { id: '1', title: '規劃產品架構與功能清單', priority: '🔥 緊急', status: 'todo' },
+            { id: '2', title: '前端 UI 畫面切版與美化', priority: '⚡ 普通', status: 'doing' },
+            { id: '3', title: '部署免費網站至 GitHub Pages', priority: '💡 低優先度', status: 'done' }
+        ];
+
+        let tasks = JSON.parse(localStorage.getItem('pm_tasks')) || defaultTasks;
+
+        // 渲染畫面
+        function renderBoard() {
+            const columns = { todo: [], doing: [], done: [] };
+            tasks.forEach(task => { if(columns[task.status]) columns[task.status].push(task); });
+
+            for (let status in columns) {
+                const container = document.getElementById(status);
+                document.getElementById(`count-${status}`).innerText = columns[status].length;
+                
+                container.innerHTML = columns[status].map(task => `
+                    <div data-id="${task.id}" class="bg-white p-4 rounded-lg shadow-xs border border-gray-200 cursor-grab active:cursor-grabbing hover:border-gray-300 transition">
+                        <div class="flex justify-between items-start gap-2 mb-2">
+                            <p class="text-sm font-medium text-gray-800">${task.title}</p>
+                            <button onclick="deleteTask('${task.id}')" class="text-gray-400 hover:text-red-500 text-xs transition cursor-pointer">🗑️</button>
+                        </div>
+                        <span class="inline-block text-[11px] font-medium px-2 py-0.5 rounded-sm bg-gray-100 text-gray-600 border border-gray-200/60">
+                            ${task.priority}
+                        </span>
+                    </div>
+                `).join('');
+            }
+            updateProgress();
+        }
+
+        // 更新整體進度條
+        function updateProgress() {
+            if (tasks.length === 0) {
+                document.getElementById('progress-bar').style.width = '0%';
+                document.getElementById('progress-text').innerText = '0%';
+                return;
+            }
+            const doneCount = tasks.filter(t => t.status === 'done').length;
+            const percentage = Math.round((doneCount / tasks.length) * 100);
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+            document.getElementById('progress-text').innerText = `${percentage}%`;
+        }
+
+        // 新增任務
+        function addNewTask() {
+            const titleInput = document.getElementById('task-title');
+            const priorityInput = document.getElementById('task-priority');
+            
+            if (!titleInput.value.trim()) return alert('請輸入任務名稱！');
+
+            const newTask = {
+                id: Date.now().toString(),
+                title: titleInput.value.trim(),
+                priority: priorityInput.value,
+                status: 'todo'
+            };
+
+            tasks.push(newTask);
+            saveAndRender();
+            titleInput.value = '';
+        }
+
+        // 刪除任務
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            saveAndRender();
+        }
+
+        // 儲存至本地端並重繪
+        function saveAndRender() {
+            localStorage.setItem('pm_tasks', JSON.stringify(tasks));
+            renderBoard();
+        }
+
+        // 啟用 SortableJS 拖曳效果
+        ['todo', 'doing', 'done'].forEach(status => {
+            new Sortable(document.getElementById(status), {
+                group: 'kanban',
+                animation: 150,
+                ghostClass: 'bg-gray-50',
+                chosenClass: 'shadow-md',
+                onEnd: function (evt) {
+                    const taskId = evt.item.getAttribute('data-id');
+                    const newStatus = evt.to.id;
+                    
+                    // 更新陣列中該任務的狀態
+                    const task = tasks.find(t => t.id === taskId);
+                    if (task) {
+                        task.status = newStatus;
+                        saveAndRender();
+                    }
+                }
+            });
+        });
+
+        // 首次載入
+        renderBoard();
+    </script>
 </body>
 </html>
