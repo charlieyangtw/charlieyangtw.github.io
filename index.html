@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>隨便看看 test-0</title>
+    <title>隨便看看</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
@@ -48,7 +48,7 @@
     <footer class="w-full bg-white border-t border-gray-200 px-6 py-3 flex justify-end items-center gap-6 text-xs text-gray-500 font-medium shrink-0">
         <div class="flex items-center gap-1">
             <span class="text-gray-400">程式版本:</span>
-            <span id="app-version"></span>
+            <span id="app-version">v2026.05.21.1</span>
         </div>
         <div class="flex items-center gap-1">
             <span class="text-gray-400">資料版本:</span>
@@ -94,7 +94,6 @@
 				// ----------------------------------------------------
 				// 未來如果試算表增加了新欄位，直接複製下面其中一行、改改 ID 就能用
 				if (configMap['Title'])       document.getElementById('site-title').innerHTML = configMap['Title'];
-				if (configMap['AppVersion'])  document.getElementById('app-version').innerHTML = configMap['AppVersion'];
 				if (configMap['DataVersion']) document.getElementById('data-version').innerHTML = configMap['DataVersion'];
 				
 				// ----------------------------------------------------
