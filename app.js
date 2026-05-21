@@ -4,6 +4,8 @@ let projectData = [];
 
 // ======= 🎨 1. 動態注入 UI 結構 =======
 function renderAppLayout() {
+	const appContainer = document.getElementById('app');
+	
     // 這裡就是你原本寫在 body 裡面的所有 HTML 結構
     appContainer.innerHTML = `
         <header class="bg-white border-b border-gray-200 h-[70px] px-6 flex items-center justify-between shadow-xs shrink-0">
