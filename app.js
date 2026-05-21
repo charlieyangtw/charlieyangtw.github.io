@@ -54,20 +54,9 @@ function renderAppLayout() {
 // ======= 🚀 2. 業務邏輯與 API 呼叫 =======
 async function loadSpreadsheetData() {
     try {
-		// ----------------------------------------------------
-        // 【新增】1. 先動態讀取外部的 url.txt 檔案
-        // ----------------------------------------------------
-        const configResponse = await fetch('app.setting');
-        const base64Text = await configResponse.text();
-        
-        // 【新增】2. 使用內建 atob() 將 Base64 解碼還原成真實 URL
-        // (.trim() 可以濾掉文字檔可能不小心按到的換行或空白)
-        const SPREADSHEET_CSV_URL = atob(base64Text.trim());
-        
-        // ----------------------------------------------------
-        // 3. 接下來的邏輯完全不變
-        // ----------------------------------------------------
-        const response = await fetch(SPREADSHEET_CSV_URL);
+		// 直接呼叫你的 Cloudflare Worker 代理網址
+        const PROXY_URL = "https://google-spreadsheet.charlieyangtw.workers.dev/";
+        const response = await fetch(PROXY_URL);
         const csvText = await response.text();
         
         const results = Papa.parse(csvText, {
