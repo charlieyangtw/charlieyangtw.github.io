@@ -40,8 +40,9 @@
             </section>
 
             <section class="flex-1 p-6">
-                <div id="detail-html" class="w-full h-full min-h-[300px]"></div>
-            </section>
+				<div id="detail-html" class="w-full h-full min-h-[400px] overflow-y-auto">
+					</div>
+			</section>
         </main>
     </div> <footer class="w-full bg-white border-t border-gray-200 px-6 py-3 flex justify-end items-center gap-6 text-xs text-gray-500 font-medium shrink-0">
         <div class="flex items-center gap-1">
@@ -56,9 +57,9 @@
 
     <script>
         // ======= 🛠️ 請在此處貼上你在步驟 1 複製的 Google 試算表 CSV 網址 =======
-        const SPREADSHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRDLk_cATMmyuBpYBj9ky-snNltxCM4jb45B_6WjhhqUPCgPgE16cfhCATIFoSeEP-4DWwDURCQ2Ql3/pub?output=csv";
+        const SPREADSHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRDLk_cATMmyuBpYBj9ky-snNltxCM4jb45B_6WjhhqUPCgPgE16cfhCATIFoSeEP-4DWwDURCQ2Ql3/pub?gid=0&single=true&output=csv";
 
-        let projectData = []; // 這裡未來只儲存 功能為 1 的清單資料
+		let projectData = []; // 這裡未來只儲存 功能為 1 的清單資料
 
         // 從 Google Sheets 抓取資料
         async function loadSpreadsheetData() {
