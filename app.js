@@ -41,7 +41,7 @@ function renderAppLayout() {
         <footer class="w-full bg-white border-t border-gray-200 px-6 py-3 flex justify-end items-center gap-6 text-xs text-gray-500 font-medium shrink-0">
             <div class="flex items-center gap-1">
                 <span class="text-gray-400">程式版本:</span>
-                <span id="app-version">讀取中...</span>
+                <span id="app-version">v2026.05.21-6</span>
             </div>
             <div class="flex items-center gap-1">
                 <span class="text-gray-400">資料版本:</span>
@@ -76,10 +76,18 @@ async function loadSpreadsheetData() {
         });
 
         if (configMap['Title']) {
-            document.getElementById('site-title').innerHTML = configMap['Title'];
-            document.title = configMap['Title']; // 順便把瀏覽器頁籤標題也換掉
-        }
-        if (configMap['AppVersion']) document.getElementById('app-version').innerHTML = configMap['AppVersion'];
+			// 1. 左上角網頁標題：維持 innerHTML，這樣才能完美支援你的 Tailwind 顏色或字體樣式
+			document.getElementById('site-title').innerHTML = configMap['Title'];
+			
+			// 2. 瀏覽器頁籤標題：利用暫時性的 DOM 節點，把 HTML 轉化為乾淨的純文字
+			const tempDiv = document.createElement('div');
+			tempDiv.innerHTML = configMap['Title'];
+			const cleanPlainText = tempDiv.textContent || tempDiv.innerText || '';
+			
+			// 3. 安全注入純文字，頁籤就不會再出現任何 <span> 或 <div> 原始碼了
+			document.title = cleanPlainText.trim(); 
+		}
+        //if (configMap['AppVersion']) document.getElementById('app-version').innerHTML = configMap['AppVersion'];
         if (configMap['DataVersion']) document.getElementById('data-version').innerHTML = configMap['DataVersion'];
         
         projectData = rawData.filter(item => String(item['功能']).trim() === '1');
