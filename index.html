@@ -30,8 +30,8 @@
             </div>
         </aside>
 
-        <main class="w-2/3 flex flex-col h-full bg-gray-50/50 overflow-y-auto">
-            <section class="p-6 bg-white border-b border-gray-200 shadow-2xs">
+		<main class="w-2/3 flex flex-col h-full bg-gray-50/50 overflow-hidden">
+            <section class="p-6 bg-white border-b border-gray-200 shadow-2xs shrink-0">
                 <div class="flex justify-between items-start gap-4 mb-2">
                     <h2 id="detail-title" class="text-lg font-bold text-gray-900">請選擇左側項目</h2>
                     <span id="detail-date" class="text-xs text-gray-400 whitespace-nowrap"></span>
@@ -39,11 +39,11 @@
                 <div id="detail-desc" class="text-sm text-gray-600 leading-relaxed whitespace-pre-line"></div>
             </section>
 
-            <section class="flex-1 p-6">
-				<div id="detail-html" class="w-full h-full min-h-[400px] overflow-y-auto">
-					</div>
-			</section>
+            <section class="flex-1 p-6 overflow-y-auto">
+                <div id="detail-html" class="w-full h-full min-h-[300px]"></div>
+            </section>
         </main>
+		
     </div> <footer class="w-full bg-white border-t border-gray-200 px-6 py-3 flex justify-end items-center gap-6 text-xs text-gray-500 font-medium shrink-0">
         <div class="flex items-center gap-1">
             <span class="text-gray-400">程式版本:</span>
@@ -135,24 +135,39 @@
 			if (!item) return;
 
 			// 1. 更新右上方的標題、日期與描述
-			document.getElementById('detail-title').innerText = item['主旨'];
+			document.getElementById('detail-title').innerText = item['主旨'] || '';
 			document.getElementById('detail-date').innerText = item['建立日期時間'] ? `📅 ${item['建立日期時間']}` : '';
 			document.getElementById('detail-desc').innerText = item['描述'] || '無描述';
 			
-			// 2. 處理並渲染右下方的內崁 HTML
+			// 2. 安全隔離渲染右下方的內崁 HTML
 			const htmlContainer = document.getElementById('detail-html');
 			let rawHtml = item['內崁html儲存'] || '';
 
+			// 【核心修正】每次切換時，清空並重新建立一個乾淨的沙盒隔離區
+			htmlContainer.innerHTML = ''; 
+			
 			if (rawHtml) {
 				let cleanHtml = rawHtml.replace(/""/g, '"'); 
 
-				// 【智慧判斷】如果內容不包含 HTML 結束標籤（如 </p> 或 </div>），代表是普通文字排版
+				// 智慧換行判斷
 				if (!cleanHtml.includes('</')) {
-					// 自動將換行符號轉為網頁看得懂的 <br>
 					cleanHtml = cleanHtml.replace(/\r?\n/g, '<br>');
 				}
 
-				htmlContainer.innerHTML = cleanHtml;
+				// 使用 Shadow DOM 技術：建立一個不影響外部的「影子根節點」
+				let shadow;
+				if (!htmlContainer.shadowRoot) {
+					shadow = htmlContainer.attachShadow({ mode: 'open' });
+				} else {
+					shadow = htmlContainer.shadowRoot;
+					shadow.innerHTML = '';
+				}
+
+				// 【關鍵】將 Tailwind CSS 的樣式檔一同引入沙盒，確保履歷卡的排版不跑號
+				shadow.innerHTML = `
+					<link href="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4" rel="stylesheet">
+					<div class="w-full h-full">${cleanHtml}</div>
+				`;
 			} else {
 				htmlContainer.innerHTML = `<p class="text-xs text-gray-400 italic">此項目無內嵌 HTML 內容</p>`;
 			}
